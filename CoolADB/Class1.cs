@@ -34,7 +34,6 @@ namespace CoolADB
         public ADBClient()
         {
             CMD.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CMD_Send);
-            CMD.WorkerSupportsCancellation = true;
         }
 
         // Needed data types for our emulated shell
@@ -56,7 +55,6 @@ namespace CoolADB
             startInfo.Arguments = "/C \"" + Command + "\"";
             process.StartInfo = startInfo;
             process.Start();
-            if (Command.StartsWith("\"" + adbPath + "\" reboot")) { Complete = true; CMD.CancelAsync(); }
             if (Command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
             process.WaitForExit();
             output = process.StandardOutput.ReadToEnd();
@@ -144,9 +142,9 @@ namespace CoolADB
 
         public void Reboot(BootState boot)
         {
-            if (boot == BootState.System) SendCommand("\"" + adbPath + "\" reboot");
-            if (boot == BootState.Bootloader) SendCommand("\"" + adbPath + "\" reboot bootloader");
-            if (boot == BootState.Recovery) SendCommand("\"" + adbPath + "\" reboot recovery");
+            if (boot == BootState.System) SendCommand("\"" + adbPath + "\" shell su -c \"reboot\"");
+            if (boot == BootState.Bootloader) SendCommand("\"" + adbPath + "\" shell su -c \"reboot bootloader\"");
+            if (boot == BootState.Recovery) SendCommand("\"" + adbPath + "\" shell su -c \"reboot recovery\"");
         }
 
         public void Push(string input, string output)
