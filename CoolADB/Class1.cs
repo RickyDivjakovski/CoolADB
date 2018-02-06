@@ -145,8 +145,8 @@ namespace CoolADB
         public void Reboot(BootState boot)
         {
             if (boot == BootState.System) SendCommand("\"" + adbPath + "\" reboot");
-            if (boot == BootState.Bootloader) SendCommand("\"" + adbPath + "\" bootloader");
-            if (boot == BootState.Recovery) SendCommand("\"" + adbPath + "\" recovery");
+            if (boot == BootState.Bootloader) SendCommand("\"" + adbPath + "\" reboot bootloader");
+            if (boot == BootState.Recovery) SendCommand("\"" + adbPath + "\" reboot recovery");
         }
 
         public void Push(string input, string output)
