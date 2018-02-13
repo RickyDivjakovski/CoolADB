@@ -120,11 +120,12 @@ namespace CoolADB
         {
             List<string> devices = new List<string>();
             SendCommand("\"" + adbPath + "\" devices");
-            int lineIndex = 0;
+            int lineIndex = -1;
             foreach (string line in output.Split('\n'))
             {
-                if (lineIndex > 0) devices.Add(line.Split().First());
                 lineIndex++;
+                if (lineIndex == 0 || String.IsNullOrEmpty(line) || line[0] == '*') continue;
+                devices.Add(line.Split().First());
             }
             return devices;
         }
