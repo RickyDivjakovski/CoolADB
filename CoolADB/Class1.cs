@@ -30,12 +30,11 @@ namespace CoolADB
 
         public ADBClient()
         {
-            CMD.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CMD_Send);
+            CMD.DoWork += new DoWorkEventHandler(CMD_Send);
         }
 
         // Needed data types for our emulated shell
         string Command = "";
-        string output = "";
         bool Complete = false;
 
         // Create an emulated shell for executing commands
@@ -54,7 +53,7 @@ namespace CoolADB
             process.Start();
             if (Command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
             process.WaitForExit();
-            output = process.StandardOutput.ReadToEnd();
+            Output = process.StandardOutput.ReadToEnd();
             Complete = true;
         }
 
@@ -64,7 +63,7 @@ namespace CoolADB
             CMD.WorkerSupportsCancellation = true;
             Command = command;
             CMD.RunWorkerAsync();
-            while (Complete == false) Sleep(500);
+            while (!Complete) Sleep(500);
             Complete = false;
         }
 
@@ -86,10 +85,7 @@ namespace CoolADB
 
         // ----------------------------------------- Allow public modifiers to get output
 
-        public string Output
-        {
-            get { return output; }
-        }
+        public string Output { get; private set; }
 
         // ----------------------------------------- Functions
 
@@ -118,7 +114,7 @@ namespace CoolADB
             List<string> devices = new List<string>();
             SendCommand("\"" + adbPath + "\" devices");
             int lineIndex = 0;
-            foreach (string line in output.Split('\n'))
+            foreach (string line in Output.Split('\n'))
             {
                 if (lineIndex > 0) devices.Add(line.Split().First());
                 lineIndex++;
@@ -128,7 +124,7 @@ namespace CoolADB
 
         public void Execute(string command, bool asroot)
         {
-            if (asroot == true) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
+            if (asroot) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
             else SendCommand("\"" + adbPath + "\" shell " + command);
         }
 
