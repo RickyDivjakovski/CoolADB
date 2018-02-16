@@ -111,17 +111,11 @@ namespace CoolADB
 
         public List<string> Devices()
         {
-            List<string> devices = new List<string>();
             SendCommand("\"" + adbPath + "\" devices");
 
             string[] outLines = Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (string line in outLines.Skip(1))
-            {
-                devices.Add(line);
-            }
-
-            return devices;
+            return outLines.Skip(1).ToList();
         }
 
         public void Execute(string command, bool asroot)
