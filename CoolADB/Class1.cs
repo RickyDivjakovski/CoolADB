@@ -113,12 +113,14 @@ namespace CoolADB
         {
             List<string> devices = new List<string>();
             SendCommand("\"" + adbPath + "\" devices");
-            int lineIndex = 0;
-            foreach (string line in Output.Split('\n'))
+
+            string[] outLines = Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in outLines.Skip(1))
             {
-                if (lineIndex > 0) devices.Add(line.Split().First());
-                lineIndex++;
+                devices.Add(line);
             }
+
             return devices;
         }
 
