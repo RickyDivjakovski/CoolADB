@@ -17,7 +17,7 @@ namespace CoolADB
             get { return adbPath; }
             set
             {
-                if (value != null && !string.IsNullOrWhiteSpace(value) && File.Exists(value)) adbPath = value;
+                if (File.Exists(value)) adbPath = value;
                 else adbPath = "\"" + adbPath + "\"";
             }
         }
