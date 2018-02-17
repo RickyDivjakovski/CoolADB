@@ -11,7 +11,7 @@ namespace CoolADB
     public partial class ADBClient : Component
     {
         // ----------------------------------------- Adb.exe path, leave blank if in same directory as app or included in PATH
-        private string adbPath = "adb";
+        string adbPath = "adb";
         public string AdbPath
         {
             get { return adbPath; }
@@ -26,7 +26,7 @@ namespace CoolADB
 
         // Create a background thread an assign work event to our emulated shell method
         BackgroundWorker CMD = new BackgroundWorker();
-        private Process Shell;
+        Process shell;
 
         public ADBClient()
         {
@@ -34,7 +34,7 @@ namespace CoolADB
         }
 
         // Needed data types for our emulated shell
-        bool Complete = false;
+        bool complete;
 
         // Create an emulated shell for executing commands
         private void CMD_Send(object sender, DoWorkEventArgs e)
@@ -42,7 +42,7 @@ namespace CoolADB
             string command = (string)e.Argument;
 
             Process process = new Process();
-            Shell = process;
+            shell = process;
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.CreateNoWindow = true;
@@ -52,10 +52,10 @@ namespace CoolADB
             startInfo.Arguments = "/C \"" + command + "\"";
             process.StartInfo = startInfo;
             process.Start();
-            if (command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
+            if (command.StartsWith("\"" + adbPath + "\" logcat")) complete = true;
             process.WaitForExit();
             Output = process.StandardOutput.ReadToEnd();
-            Complete = true;
+            complete = true;
         }
 
         // Send a command to emulated shell
@@ -63,8 +63,8 @@ namespace CoolADB
         {
             CMD.WorkerSupportsCancellation = true;
             CMD.RunWorkerAsync(command);
-            while (!Complete) Sleep(500);
-            Complete = false;
+            while (!complete) Sleep(500);
+            complete = false;
         }
 
         // Sleep until output
