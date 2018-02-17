@@ -34,12 +34,13 @@ namespace CoolADB
         }
 
         // Needed data types for our emulated shell
-        string Command = "";
         bool Complete = false;
 
         // Create an emulated shell for executing commands
         private void CMD_Send(object sender, DoWorkEventArgs e)
         {
+            string command = (string)e.Argument;
+
             Process process = new Process();
             Shell = process;
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -48,10 +49,10 @@ namespace CoolADB
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C \"" + Command + "\"";
+            startInfo.Arguments = "/C \"" + command + "\"";
             process.StartInfo = startInfo;
             process.Start();
-            if (Command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
+            if (command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
             process.WaitForExit();
             Output = process.StandardOutput.ReadToEnd();
             Complete = true;
@@ -61,8 +62,7 @@ namespace CoolADB
         private void SendCommand(string command)
         {
             CMD.WorkerSupportsCancellation = true;
-            Command = command;
-            CMD.RunWorkerAsync();
+            CMD.RunWorkerAsync(command);
             while (!Complete) Sleep(500);
             Complete = false;
         }
