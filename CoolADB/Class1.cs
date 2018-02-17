@@ -120,8 +120,10 @@ namespace CoolADB
 
         public void Execute(string command, bool asroot)
         {
-            if (asroot) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
-            else SendCommand("\"" + adbPath + "\" shell " + command);
+            if (asroot)
+                SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
+            else
+                SendCommand("\"" + adbPath + "\" shell " + command);
         }
 
         public void Remount()
@@ -138,18 +140,62 @@ namespace CoolADB
 
         public void Push(string input, string output)
         {
-            try { SendCommand("\"" + adbPath + "\" push \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" push \"" + input.Replace("/", "\\") + "\" \"" + output + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" push \"" + input + "\" \"" + output + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" push \"" + input.Replace("/", "\\") + "\" \"" + output + "\"");
+                }
+                catch { }
+            }
         }
 
         public void Pull(string input, string output)
         {
-            if (!string.IsNullOrWhiteSpace(output)) try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\""); } catch { } }
-            else try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\""); } catch { }
+            if (!string.IsNullOrWhiteSpace(output))
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\"");
+                    }
+                    catch { }
+                }
+            }
+            else
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" pull \"" + input + "\"");
+                }
+                catch { }
+            }
         }
 
         public void Install(string application)
         {
-            try { SendCommand("\"" + adbPath + "\" install \"" + application + "\""); } catch { try { SendCommand("\"" + adbPath + "\" install \"" + application.Replace("/", "\\") + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" install \"" + application + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" install \"" + application.Replace("/", "\\") + "\"");
+                }
+                catch
+                { }
+            }
         }
 
         public void Uninstall(string packageName)
@@ -159,19 +205,63 @@ namespace CoolADB
 
         public void Backup(string backupPath, string backupArgs)
         {
-            if (!string.IsNullOrWhiteSpace(backupArgs)) SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\" " + "\"" + backupArgs + "\"");
-            else SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\"");
+            if (!string.IsNullOrWhiteSpace(backupArgs))
+                SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\" " + "\"" + backupArgs + "\"");
+            else
+                SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\"");
         }
 
         public void Restore(string backupPath)
         {
-            try { SendCommand("\"" + adbPath + "\" restore \"" + backupPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" restore \"" + backupPath.Replace("/", "\\") + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" restore \"" + backupPath + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" restore \"" + backupPath.Replace("/", "\\") + "\"");
+                }
+                catch
+                { }
+            }
         }
 
         public void Logcat(string logPath, bool overWrite)
         {
-            if (overWrite) try { SendCommand("\"" + adbPath + "\" logcat > \"" + logPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" logcat > \"" + logPath.Replace("/", "\\") + "\""); } catch { } }
-            else try { SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath.Replace("/", "\\") + "\""); } catch { } }
+            if (overWrite)
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" logcat > \"" + logPath + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" logcat > \"" + logPath.Replace("/", "\\") + "\"");
+                    }
+                    catch
+                    { }
+                }
+            }
+            else
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath.Replace("/", "\\") + "\"");
+                    }
+                    catch
+                    { }
+                }
+            }
         }
     }
 }
