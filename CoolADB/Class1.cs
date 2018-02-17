@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace CoolADB
 {
-    public partial class ADBClient : Component
+    public class ADBClient
     {
         // ----------------------------------------- Adb.exe path, leave blank if in same directory as app or included in PATH
         string adbPath = "adb";
