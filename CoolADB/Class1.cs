@@ -94,7 +94,7 @@ namespace CoolADB
             SendCommand("\"" + adbPath + "\" connect " + ip);
         }
 
-        public void Disconnect(decimal ip)
+        public void Disconnect(string ip)
         {
             SendCommand("\"" + adbPath + "\" disconnect " + ip);
         }
@@ -143,7 +143,7 @@ namespace CoolADB
 
         public void Pull(string input, string output)
         {
-            if (output != null && !string.IsNullOrWhiteSpace(output)) try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\""); } catch { } }
+            if (!string.IsNullOrWhiteSpace(output)) try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\""); } catch { } }
             else try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\""); } catch { }
         }
 
