@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
-using System.IO;
-using System.Threading;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CoolADB
@@ -20,7 +17,7 @@ namespace CoolADB
             get { return adbPath; }
             set
             {
-                if (value != null && !string.IsNullOrWhiteSpace(value) && File.Exists(value)) adbPath = value;
+                if (File.Exists(value)) adbPath = value;
                 else adbPath = "\"" + adbPath + "\"";
             }
         }
@@ -33,12 +30,11 @@ namespace CoolADB
 
         public ADBClient()
         {
-            CMD.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CMD_Send);
+            CMD.DoWork += new DoWorkEventHandler(CMD_Send);
         }
 
         // Needed data types for our emulated shell
         string Command = "";
-        string output = "";
         bool Complete = false;
 
         // Create an emulated shell for executing commands
@@ -57,7 +53,7 @@ namespace CoolADB
             process.Start();
             if (Command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
             process.WaitForExit();
-            output = process.StandardOutput.ReadToEnd();
+            Output = process.StandardOutput.ReadToEnd();
             Complete = true;
         }
 
@@ -67,7 +63,7 @@ namespace CoolADB
             CMD.WorkerSupportsCancellation = true;
             Command = command;
             CMD.RunWorkerAsync();
-            while (Complete == false) Sleep(500);
+            while (!Complete) Sleep(500);
             Complete = false;
         }
 
@@ -89,10 +85,7 @@ namespace CoolADB
 
         // ----------------------------------------- Allow public modifiers to get output
 
-        public string Output
-        {
-            get { return output; }
-        }
+        public string Output { get; private set; }
 
         // ----------------------------------------- Functions
 
@@ -118,20 +111,16 @@ namespace CoolADB
 
         public List<string> Devices()
         {
-            List<string> devices = new List<string>();
             SendCommand("\"" + adbPath + "\" devices");
-            int lineIndex = 0;
-            foreach (string line in output.Split('\n'))
-            {
-                if (lineIndex > 0) devices.Add(line.Split().First());
-                lineIndex++;
-            }
-            return devices;
+
+            string[] outLines = Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            return outLines.Skip(1).ToList();
         }
 
         public void Execute(string command, bool asroot)
         {
-            if (asroot == true) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
+            if (asroot) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
             else SendCommand("\"" + adbPath + "\" shell " + command);
         }
 
