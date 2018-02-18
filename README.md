@@ -4,58 +4,58 @@ A C# Android Debug Bridge client for .net.
 
 ## Method and function examples
 -Create the client  
-ADBClient MyClient = new ADBClient();
+ADBClient myClient = new ADBClient();
 
 -Set the path of adb.exe here or leave null if PATH is defined or adb.exe is in the same directory as the host application  
-MyClient.AdbPath = @"C:\path\to\adb.exe";
+myClient.AdbPath = @"C:\path\to\adb.exe";
 
 -Connect via ip  
-MyClient.Connect("192.192.192.192");
+myClient.Connect("192.192.192.192");
 
 -Disconnect  
-MyClient.Disconnect();
+myClient.Disconnect("192.192.192.192");
 
 -Kill server  
-MyClient.KillServer();
+myClient.KillServer();
 
 -Start server  
-MyClient.StartServer();
+myClient.StartServer();
 
 -Get output of adb(string)  
-string adbOutput = MyClient.Output;
+string adbOutput = myClient.Output;
 
--List device(array)  
-MyClient.Devices()[0];
+-List devices(array)  
+myClient.Devices();
 
 -Exececute command on device(2nd boot is if root is needed)  
-MyClient.Command("rm -rf /system/app/myApp.apk", true);
+myClient.Command("rm -rf /system/app/myApp.apk", true);
 
 -Remount system as r/w(bypasses cannot be run in production builds)  
-MyClient.Remount();
+myClient.Remount();
 
 -Reboot to any state(arg is a bootstate enum)  
-MyClient.Reboot(ADBClient.BootState.Recovery);
+myClient.Reboot(ADBClient.BootState.Recovery);
 
 -Push file(forward or backslashes dont matter)  
-MyClient.Push(@"C:\path\to\my\file", "/sdcard");
+myClient.Push(@"C:\path\to\my\file", "/sdcard");
 
 -Pull file(forward or backslashes dont matter)  
-MyClient.Push("/sdcard/myFile", @"C:\myFile");
+myClient.Push("/sdcard/myFile", @"C:\myFile");
 
 -Install application(forward or backslashes dont matter)  
-MyClient.Install(@"C:\path\to\apk");
+myClient.Install(@"C:\path\to\apk");
 
 -Uninstall application  
-MyClient.Uninstall(com.my.package.name);
+myClient.Uninstall("com.my.package.name");
 
 -Backup(2nd arg is backup args)  
-MyClient.Backup(@"C:\backup.ab", "-noapk")
+myClient.Backup(@"C:\backup.ab", "-noapk")
 
 -Restore  
-MyClient.Restore(@"C:\backup.ab");
+myClient.Restore(@"C:\backup.ab");
 
 -Logcat(2nd arg is overwrite file if exists)  
-MyClient.Logcat(@"C:\logcat.txt", true);
+myClient.Logcat(@"C:\logcat.txt", true);
 
 ## Contributors
 Myself - Ricky Divjakovski

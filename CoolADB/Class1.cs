@@ -8,10 +8,10 @@ using System.Windows.Forms;
 
 namespace CoolADB
 {
-    public partial class ADBClient : Component
+    public class ADBClient
     {
         // ----------------------------------------- Adb.exe path, leave blank if in same directory as app or included in PATH
-        private string adbPath = "adb";
+        string adbPath = "adb";
         public string AdbPath
         {
             get { return adbPath; }
@@ -26,7 +26,7 @@ namespace CoolADB
 
         // Create a background thread an assign work event to our emulated shell method
         BackgroundWorker CMD = new BackgroundWorker();
-        private Process Shell;
+        Process shell;
 
         public ADBClient()
         {
@@ -34,37 +34,37 @@ namespace CoolADB
         }
 
         // Needed data types for our emulated shell
-        string Command = "";
-        bool Complete = false;
+        bool complete;
 
         // Create an emulated shell for executing commands
         private void CMD_Send(object sender, DoWorkEventArgs e)
         {
+            string command = (string)e.Argument;
+
             Process process = new Process();
-            Shell = process;
+            shell = process;
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C \"" + Command + "\"";
+            startInfo.Arguments = "/C \"" + command + "\"";
             process.StartInfo = startInfo;
             process.Start();
-            if (Command.StartsWith("\"" + adbPath + "\" logcat")) Complete = true;
+            if (command.StartsWith("\"" + adbPath + "\" logcat")) complete = true;
             process.WaitForExit();
             Output = process.StandardOutput.ReadToEnd();
-            Complete = true;
+            complete = true;
         }
 
         // Send a command to emulated shell
         private void SendCommand(string command)
         {
             CMD.WorkerSupportsCancellation = true;
-            Command = command;
-            CMD.RunWorkerAsync();
-            while (!Complete) Sleep(500);
-            Complete = false;
+            CMD.RunWorkerAsync(command);
+            while (!complete) Sleep(500);
+            complete = false;
         }
 
         // Sleep until output
@@ -94,7 +94,7 @@ namespace CoolADB
             SendCommand("\"" + adbPath + "\" connect " + ip);
         }
 
-        public void Disconnect(decimal ip)
+        public void Disconnect(string ip)
         {
             SendCommand("\"" + adbPath + "\" disconnect " + ip);
         }
@@ -120,8 +120,10 @@ namespace CoolADB
 
         public void Execute(string command, bool asroot)
         {
-            if (asroot) SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
-            else SendCommand("\"" + adbPath + "\" shell " + command);
+            if (asroot)
+                SendCommand("\"" + adbPath + "\" shell su -c \"" + command + "\"");
+            else
+                SendCommand("\"" + adbPath + "\" shell " + command);
         }
 
         public void Remount()
@@ -138,18 +140,62 @@ namespace CoolADB
 
         public void Push(string input, string output)
         {
-            try { SendCommand("\"" + adbPath + "\" push \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" push \"" + input.Replace("/", "\\") + "\" \"" + output + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" push \"" + input + "\" \"" + output + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" push \"" + input.Replace("/", "\\") + "\" \"" + output + "\"");
+                }
+                catch { }
+            }
         }
 
         public void Pull(string input, string output)
         {
-            if (output != null && !string.IsNullOrWhiteSpace(output)) try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\""); } catch { try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\""); } catch { } }
-            else try { SendCommand("\"" + adbPath + "\" pull \"" + input + "\""); } catch { }
+            if (!string.IsNullOrWhiteSpace(output))
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" pull \"" + input + "\" \"" + output.Replace("/", "\\") + "\"");
+                    }
+                    catch { }
+                }
+            }
+            else
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" pull \"" + input + "\"");
+                }
+                catch { }
+            }
         }
 
         public void Install(string application)
         {
-            try { SendCommand("\"" + adbPath + "\" install \"" + application + "\""); } catch { try { SendCommand("\"" + adbPath + "\" install \"" + application.Replace("/", "\\") + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" install \"" + application + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" install \"" + application.Replace("/", "\\") + "\"");
+                }
+                catch
+                { }
+            }
         }
 
         public void Uninstall(string packageName)
@@ -159,19 +205,63 @@ namespace CoolADB
 
         public void Backup(string backupPath, string backupArgs)
         {
-            if (backupArgs != null && !string.IsNullOrWhiteSpace(backupArgs)) SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\" " + "\"" + backupArgs + "\"");
-            else SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\"");
+            if (!string.IsNullOrWhiteSpace(backupArgs))
+                SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\" " + "\"" + backupArgs + "\"");
+            else
+                SendCommand("\"" + adbPath + "\" backup \"" + backupPath + "\"");
         }
 
         public void Restore(string backupPath)
         {
-            try { SendCommand("\"" + adbPath + "\" restore \"" + backupPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" restore \"" + backupPath.Replace("/", "\\") + "\""); } catch { } }
+            try
+            {
+                SendCommand("\"" + adbPath + "\" restore \"" + backupPath + "\"");
+            }
+            catch
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" restore \"" + backupPath.Replace("/", "\\") + "\"");
+                }
+                catch
+                { }
+            }
         }
 
         public void Logcat(string logPath, bool overWrite)
         {
-            if (overWrite == true) try { SendCommand("\"" + adbPath + "\" logcat > \"" + logPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" logcat > \"" + logPath.Replace("/", "\\") + "\""); } catch { } }
-            else try { SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath + "\""); } catch { try { SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath.Replace("/", "\\") + "\""); } catch { } }
+            if (overWrite)
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" logcat > \"" + logPath + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" logcat > \"" + logPath.Replace("/", "\\") + "\"");
+                    }
+                    catch
+                    { }
+                }
+            }
+            else
+            {
+                try
+                {
+                    SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath + "\"");
+                }
+                catch
+                {
+                    try
+                    {
+                        SendCommand("\"" + adbPath + "\" logcat >> \"" + logPath.Replace("/", "\\") + "\"");
+                    }
+                    catch
+                    { }
+                }
+            }
         }
     }
 }
